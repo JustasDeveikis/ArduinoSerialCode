@@ -1,0 +1,16 @@
+en2
+en3
+dac2 0V
+dac3 6V
+en4
+en5
+dac4 0V
+dac5 8V
+en8
+en9
+dac8 7V
+dac9 0V
+en14
+en15
+dac14 9V
+dac15 0V

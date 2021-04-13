@@ -10,7 +10,7 @@ Created on Fri Mar 26 14:48:43 2021
 -------------------------------------------------------------------------------------------------------'''
 
 import tkinter as tk
-from  tkinter import font as tkFont
+# from  tkinter import font as tkFont
 import numpy as np
 import sys
 
@@ -39,7 +39,7 @@ CH_LIST = np.arange(16).astype(str)  # a list for channel numbers - it can be mo
 class Interface():
     
     def __init__(self, master):
-        self.master = master
+        self.master = master  # initialising window
         
         # Matrices for storing button objects needed for update methods
         self.phase_btn_matrix = []
@@ -52,17 +52,17 @@ class Interface():
         self.pixel_click = np.zeros((ROWS,COLS), dtype=bool)  # matrix to determine which pixel is on or off
         self.phase_click = np.zeros((ROWS,COLS), dtype=bool)  # matrix to determine which phase button is on or off
         
-        # Creating phase and pixel buttons and other elements
+        # Creating phase and pixel buttons
         self.insertPhaseBtns()
         self.insertPixels()
         
+        # Creating other interface elements
         self.insertEntryLabels()
         self.insertExportBtn()
         self.insertSetAllBtns()
+        self.insertVoltageAllEntry()
         
         
-        
-    
     def insertPhaseBtns(self):
         # Inserting phase control buttons
         ROWS_PHS = [0, 2, 4, 6]  # additional list to position buttons for easier layout
@@ -85,7 +85,6 @@ class Interface():
             
             self.phase_btn_matrix.append(phase_row_matrix)
     
-    
     def insertPixels(self):
         # Inserting pixel buttons
         ROWS_PIX = [1, 3, 5, 7]  # additional list to position buttons for easier layout
@@ -107,7 +106,6 @@ class Interface():
                 pixel_row_matrix.append(btn)
                 
             self.pixel_btn_matrix.append(pixel_row_matrix)
-    
     
     def insertEntryLabels(self):
         ROWS_PHS = [0, 2, 4, 6]
@@ -148,7 +146,6 @@ class Interface():
             self.voltage_matrix.append(voltage_row_matrix)
             self.enter_btn_matrix.append(enter_btn_row_matrix)
     
-    
     def updatePixels(self, row, col):
         row_add, col_add = additionalIndices(row, col)  # add additional indices to update
         
@@ -170,7 +167,6 @@ class Interface():
             # Updates additional pixel
             self.pixel_btn_matrix[col_add][row_add].config(bg = 'green')
             self.pixel_click[row_add][col_add] = True
-    
     
     def updatePhaseBtns(self, row, col):
         row_add, col_add = additionalIndices(row, col)# add additional indices to update
@@ -199,7 +195,6 @@ class Interface():
             self.pixel_btn_matrix[col][row].config(text=pixelPolArrowINV(row, col))
             self.pixel_btn_matrix[col_add][row_add].config(text=pixelPolArrowINV(row_add, col_add))
     
-    
     def updateVoltage(self, row, col):
         voltage_value = self.voltage_matrix[col][row].get()  # gets voltage value from pixel where enter button was pressed
         
@@ -210,7 +205,8 @@ class Interface():
             float(voltage_value)  # convert entered value to float
         
             if float(voltage_value) >= 0 and float(voltage_value) <=10:  # if  voltage value entered is between 0 and 10 V
-                self.voltage_matrix[col_add][row_add].delete(0, last=3)  # deletes any value which existed before
+                # Sets voltage of additional pixel
+                self.voltage_matrix[col_add][row_add].delete(0, last=300)  # deletes any value which existed before
                 self.voltage_matrix[col_add][row_add].insert(0, voltage_value)  # puts a new value on additional pixel
             else:  # if entered voltage value is too high or too low
                 self.voltage_matrix[col][row].delete(0, last=300)  # deletes value of initial entry
@@ -218,17 +214,16 @@ class Interface():
                 
                 self.voltage_matrix[col][row].insert(0, '0')  # inserts 0 instead of bad value
                 self.voltage_matrix[col_add][row_add].insert(0, '0')  # inserts 0 instead of bad value
-                print('Bad value.')
+                print('Inappropriate value.')
             
         except ValueError:
             self.voltage_matrix[col][row].delete(0, last=300)  # deletes value of initial entry
             self.voltage_matrix[col_add][row_add].delete(0, last=300)  # deletes value of additional entry
             
-            self.voltage_matrix[col][row].insert(0, '0')  # inserts 0 instead of bad value
-            self.voltage_matrix[col_add][row_add].insert(0, '0')  # inserts 0 instead of bad value
+            self.voltage_matrix[col][row].insert(0, '0')  # inserts 0 instead of a bad value
+            self.voltage_matrix[col_add][row_add].insert(0, '0')  # inserts 0 instead of a bad value
             
             print('Use numbers.')
-    
     
     def insertSetAllBtns(self):
         # turnOn button turns on all buttons
@@ -241,7 +236,7 @@ class Interface():
                           bg='red',
                           )
         turnOn['font'] = font_phase
-        turnOn.grid(row=ROWS-1, column=COLS+1, padx=10, pady=10)
+        turnOn.grid(row=ROWS*2-2, column=COLS+1, padx=10, pady=10)
         
         turnOn.bind("<Button-1>", self.turnOnAll)
     
@@ -269,7 +264,6 @@ class Interface():
             for row in range(ROWS):
                 self.updatePixels(row, col)
     
-    
     def insertExportBtn(self):
         # 'Export' button to export configuration of buttons to file
         exportBtn = tk.Button(self.master,
@@ -279,10 +273,9 @@ class Interface():
                               bg='white',
                               )
         exportBtn['font'] = font_exp
-        exportBtn.grid(row=ROWS, column=COLS+1, padx=10, pady=10)
+        exportBtn.grid(row=ROWS*2-1, column=COLS+1, padx=10, pady=10)
         
         exportBtn.bind("<Button-1>", self.exportFunction)  # executes exportFunction when clicked
-    
     
     def exportFunction(self, event):
         # Export commands to text file
@@ -296,10 +289,10 @@ class Interface():
         f.close()
         
         print('Data saved in ', filename, '.', sep='')
-        
-        
+    
     def translate(self):  # translate matrices to arduino serial commands
-        ROWS_TR = [0, 2]  # only 0th and 2nd rows are used for commands translation
+    
+        ROWS_TR = [0, 2]  # only 0th and 2nd rows are used for commands TRanslation
         
         ch_ind1, ch_ind2 = 0, 1
         
@@ -317,18 +310,80 @@ class Interface():
                     
                         # Setup DACs
                         print('dac', CH_LIST[ch_ind1], ' ', '0V', sep='')
-                        print('dac', CH_LIST[ch_ind2], ' ', str(self.voltage_matrix[row][col].get()), 'V', sep='')
+                        print('dac', CH_LIST[ch_ind2], ' ', str(self.voltage_matrix[col][row].get()), 'V', sep='')
                         
-                    else:  # requires phase correction
+                    else:  # if phase inversion is required
                     
-                        # Setup DACs
-                        print('dac', CH_LIST[ch_ind1], ' ', str(self.voltage_matrix[row][col].get()), 'V', sep='')
+                        # Setup DACs in reverse order
+                        print('dac', CH_LIST[ch_ind1], ' ', str(self.voltage_matrix[col][row].get()), 'V', sep='')
                         print('dac', CH_LIST[ch_ind2], ' ', '0V', sep='')
                 
-                # Increase channel indices by 2, because a pair of pixels requires 2 channels
+                # Increase channel indices by 2 to move on to the next pair of pixels, because a pair of pixels requires 2 channels
                 ch_ind1 += 2
                 ch_ind2 += 2
-
+    
+    def insertVoltageAllEntry(self):
+        # Inserts an entry which allows to set voltage of every pixel on the grid to specified value
+        ROW_V_ALL = 5  # number of row where elements for entry are generated
+        
+        self.entryVoltageAll = tk.Entry(self.master,
+                              width=10,
+                              )
+        self.entryVoltageAll.grid(row=ROW_V_ALL, column=COLS, columnspan=2, padx=0, pady=20, sticky="n")
+        
+        labelAll = tk.Label(self.master,
+                         text='Set voltage to all pixels',
+                         )
+        labelAll.grid(row=ROW_V_ALL, column=COLS+1, sticky="n")
+        
+        voltageAllBtn = tk.Button(self.master,
+                                  text='Enter all',
+                                  height=1,
+                                  width=7,
+                                  )
+        voltageAllBtn.grid(row=ROW_V_ALL, column=COLS+1, padx=0, pady=50, sticky="n")
+        voltageAllBtn.bind("<Button-1>", self.setVoltageAllFunction)
+    
+    def setVoltageAllFunction(self, event):
+        voltage_value = self.entryVoltageAll.get()  # get value from entry
+        
+        # Handling errors
+        try:
+            float(voltage_value)  # convert entered value to float
+        
+            if float(voltage_value) >= 0 and float(voltage_value) <=10:  # if  voltage value entered is between 0 and 10 V
+                
+            # Set voltage to 'voltage_value' of all pixels
+                for col in range(COLS):
+                    for row in range (ROWS):
+                        self.voltage_matrix[row][col].delete(0, last=300)
+                        self.voltage_matrix[row][col].insert(0, voltage_value)
+            
+            else:  # if entered voltage value is too high or too low
+            
+                self.entryVoltageAll.delete(0, last=300)  # deletes value of initial entry
+                self.entryVoltageAll.insert(0, '0')  # inserts 0 instead of bad value
+                
+                # Set voltage to 0 of every pixel
+                for col in range(COLS):
+                    for row in range (ROWS):
+                        self.voltage_matrix[row][col].delete(0, last=300)
+                        self.voltage_matrix[row][col].insert(0, '0')
+                
+                print('Inappropriate value.')
+                
+        except ValueError:  # if entered value cannot be converted to a number
+        
+            self.entryVoltageAll.delete(0, last=300)  # deletes value of initial entry
+            self.entryVoltageAll.insert(0, '0')  # inserts 0 instead of a bad value
+            
+            # Set voltage to 0 of every pixel
+            for col in range(COLS):
+                for row in range (ROWS):
+                    self.voltage_matrix[row][col].delete(0, last=300)
+                    self.voltage_matrix[row][col].insert(0, '0')
+            
+            print('Use numbers.')
 '''-------------------------------------------------------------------------------------------------------
 ---------------------------------------------------FUNCTIONS----------------------------------------------
 -------------------------------------------------------------------------------------------------------'''
@@ -398,7 +453,6 @@ def assignLabel(row, col):  # assigns label with correct channels (next to pixel
         
     return chan1, chan2
 
-
 '''-------------------------------------------------------------------------------------------------------
 ---------------------------------------------------MAIN---------------------------------------------------
 -------------------------------------------------------------------------------------------------------'''
@@ -409,13 +463,15 @@ if __name__ == '__main__':
     window.title('16-Pixel Emitter')
     
     # Selects font type and size for different elements
-    font_pix = tkFont.Font(family='Arial', size=40)
-    font_phase = tkFont.Font(family='Arial', size=10)
-    font_exp = tkFont.Font(family='Arial', size=20)
+    font_pix = tk.font.Font(family='Arial', size=40)
+    font_phase = tk.font.Font(family='Arial', size=10)
+    font_exp = tk.font.Font(family='Arial', size=20)
     
     app = Interface(window)
     window.mainloop()
     
+    print('App closed.')
+
 '''-------------------------------------------------------------------------------------------------------
 ---------------------------------------------------END----------------------------------------------------
 -------------------------------------------------------------------------------------------------------'''

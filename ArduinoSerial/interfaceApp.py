@@ -10,7 +10,7 @@ Created on Fri Mar 26 14:48:43 2021
 -------------------------------------------------------------------------------------------------------'''
 
 import tkinter as tk
-# from  tkinter import font as tkFont
+from  tkinter import font as tkFont
 import numpy as np
 import sys
 
@@ -26,8 +26,8 @@ filename = 'current'
 # CONSTANTS
 ROWS = 4
 COLS = 4
-CH_LIST = np.arange(16).astype(str)  # a list for channel numbers - it can be modified later manually when wires are connected
-# CH_LIST = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15']  # refer to emitter scheme
+# CH_LIST = np.arange(16).astype(str)  # a list for channel numbers - it can be modified later manually when wires are connected
+CH_LIST = ['13', '12', '15', '14', '7', '6', '4', '5', '9', '8', '10', '11', '2', '3', '0', '1']  # refer to emitter scheme
 '''        0    1    2    3    4    5    6    7    8    9    10    11    12    13    14    15'''
 
 
